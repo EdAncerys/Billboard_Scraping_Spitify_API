@@ -21,6 +21,7 @@ song_names_spans = soup.find_all("span", class_="chart-element__information__son
 song_names = [song.getText() for song in song_names_spans]
 print(song_names)
 
+# connecting to Spotify account
 sp = spotipy.Spotify(
     auth_manager=SpotifyOAuth(
         scope="playlist-modify-private",
@@ -32,4 +33,18 @@ sp = spotipy.Spotify(
     )
 )
 user_id = sp.current_user()["id"]
-print(user_id)
+# print(user_id)
+
+# getting song uri's based on song name & year
+song_uris = []
+year = date.split("-")[0]
+for song in song_names:
+    result = sp.search(q=f"track:{song} year:{year}", type="track")
+    print(result)
+    try:
+        uri = result["tracks"]["items"][0]["uri"]
+        song_uris.append(uri)
+    except IndexError:
+        print(f"{song} doesn't exist in Spotify. Skipped.")
+
+print(song_uris)
